@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backendcuore
+  labels:
+    app: backendcuore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backendcuore
+  template:
+    metadata:
+      labels:
+        app: backendcuore
+    spec:
+      containers:
+      - name: backendcuore
+        image: victorrpt/backend-cuore:latest
+        ports:
+        - containerPort: 3001
+          name: webserver
+        env:
+        - name: MYSQL_PASS # use only for debugging
+          value: "rtpass"
+        - name: MYSQL_HOST
+          value: "34.68.182.58"
+        - name: MYSQL_USER
+          value: "root"
+        - name: MYSQL_PORT
+          value: "3306"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: backendcuore
+spec:
+  selector:
+    app: backendcuore
+  ports:
+  - protocol: TCP
+    port: 3002
+    targetPort: 3001
+    name: backend
