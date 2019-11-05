@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscriptor
+  labels:
+    app: subscriptor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subscriptor
+  template:
+    metadata:
+      labels:
+        app: subscriptor
+    spec:
+      containers:
+      - name: subscriptor
+        image: victorrpt/backend-cuore:latest
+        ports:
+        - containerPort: 3001
+          name: webserver
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: subscriptor
+spec:
+  selector:
+    app: subscriptor
+  ports:
+  - protocol: TCP
+    port: 3002
+    targetPort: 3001
+    name: backend
