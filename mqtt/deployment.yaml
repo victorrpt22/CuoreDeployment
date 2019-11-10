@@ -1,0 +1,113 @@
+# this is a configuration file that the pod will use
+apiVersion: v1
+metadata:
+  name: mosquitto-config
+data:
+  mosquitto.conf: |
+    port 1883
+    listener 9001
+    protocol websockets
+    autosave_interval 300
+    log_dest file /mosquitto/log/mosquitto.log
+    persistence true
+    persistence_location /mosquitto/data/
+    user mosquitto
+kind: ConfigMap
+--- 
+# This is deployment you can have many replicas as nodes you have.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  labels:
+    app: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      containers:
+      - name: mosquitto
+        image: victorrpt/mosk8tto:latest # here specify the image
+        ports:
+        - containerPort: 1883
+          name: mqtt
+        - containerPort: 9001
+          name: ws
+        - containerPort: 9002
+          name: wss
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+        volumeMounts:
+        - mountPath: /mosquitto/config
+          name: mosquitto-config # this config comes from the configmap
+          readOnly: true
+      volumes:
+      - configMap:
+          name: mosquitto-config
+        name: mosquitto-config
+---
+kind: Service 
+apiVersion: v1
+metadata:
+  name: mosquitto-mqtt
+spec:
+  selector:
+    app: mosquitto
+  ports:
+  - protocol: TCP
+    port: 1883
+    targetPort: 1883
+    name: mqtt
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mosquitto-ws
+spec:
+  selector:
+    app: mosquitto
+  ports:
+  - protocol: TCP
+    port: 9001
+    targetPort: 9001
+    name: ws
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mosquitto-wss
+spec:
+  selector:
+    app: mosquitto
+  ports:
+  - protocol: TCP
+    port: 9002
+    targetPort: 9002
+    name: wss
+--- # load balancer for expose public ip
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto
+spec:
+  selector:
+    app: mosquitto
+  ports:
+    - port: 1883
+      targetPort: 1883
+      name: mqtt
+    - port: 9001
+      targetPort: 9001
+      name: ws
+  type: LoadBalancer 
