@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cuoreWeb
+  labels:
+    app: cuoreWeb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cuoreWeb
+  template:
+    metadata:
+      labels:
+        app: cuoreWeb
+    spec:
+      containers:
+      - name: cuoreWeb
+        image: victorrpt/cuore_web:latest # here specify the image
+        ports:
+        - containerPort: 3000
+          name: http
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: cuoreWeb-http
+spec:
+  selector:
+    app: cuoreWeb
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+    name: http
+apiVersion: v1
+---
+kind: Service
+metadata:
+  name: cuoreWeb
+spec:
+  selector:
+    app: cuoreWeb
+  ports:
+    - port: 8080
+      targetPort: 3000
+      name: http
+  type: LoadBalancer 
