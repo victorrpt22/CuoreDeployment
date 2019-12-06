@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cuoreWeb
+  name: cuoreweb
   labels:
-    app: cuoreWeb
+    app: cuoreweb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cuoreWeb
+      app: cuoreweb
   template:
     metadata:
       labels:
-        app: cuoreWeb
+        app: cuoreweb
     spec:
       containers:
-      - name: cuoreWeb
+      - name: cuoreweb
         image: victorrpt/cuore_web:latest # here specify the image
         ports:
         - containerPort: 3000
@@ -24,10 +24,10 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: cuoreWeb-http
+  name: cuoreweb-http
 spec:
   selector:
-    app: cuoreWeb
+    app: cuoreweb
   ports:
   - protocol: TCP
     port: 3000
@@ -37,10 +37,10 @@ apiVersion: v1
 ---
 kind: Service
 metadata:
-  name: cuoreWeb
+  name: cuoreweb
 spec:
   selector:
-    app: cuoreWeb
+    app: cuoreweb
   ports:
     - port: 8080
       targetPort: 3000
