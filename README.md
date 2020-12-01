@@ -1,2 +1,2 @@
 # CuoreDeployment
-Project to deploy school proyect
+School project
